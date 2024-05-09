@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cast Sender</title>
-    <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
-    <script>
-        const context = cast.framework.CastContext.getInstance();
-        context.setOptions({
-            receiverApplicationId: 'B23AB266',
-            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-        });
-
-        function castVideo() {
-            const mediaInfo = new chrome.cast.media.MediaInfo('http://example.com/video.mp4', 'video/mp4');
-            const request = new chrome.cast.media.LoadRequest(mediaInfo);
-            context.getCurrentSession().loadMedia(request).then(
-                () => console.log('Load succeed'),
-                error => console.error('Error loading media:', error)
-            );
-        }
-    </script>
+    <title>Cast Receiver</title>
+    <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
 </head>
 <body>
-    <button onclick="castVideo()">Cast Video</button>
+    <video id="videoElement" controls style="width: 100%;"></video>
+    <script>
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const playerManager = context.getPlayerManager();
+
+        playerManager.setMessageInterceptor(
+            cast.framework.messages.MessageType.LOAD,
+            request => {
+                const media = request.media || {};
+                if (media.contentId) {
+                    const video = document.getElementById('videoElement');
+                    video.src = media.contentId;  // 播放从 Android 应用发来的视频 URL
+                }
+                return request;
+            }
+        );
+
+        context.start();
+    </script>
 </body>
 </html>
