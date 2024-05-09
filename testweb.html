@@ -1,0 +1,28 @@
+!DOCTYPE html
+html
+head
+    titleCast Receivertitle
+head
+body
+    video id=videoElement controls style=width 100%;video
+    script src=httpswww.gstatic.comcastsdklibscaf_receiverv3cast_receiver_framework.jsscript
+    script
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const playerManager = context.getPlayerManager();
+
+        playerManager.setMessageInterceptor(
+            cast.framework.messages.MessageType.LOAD,
+            request = {
+                const media = request.media  {};
+                if (media.contentId) {
+                    const video = document.getElementById('videoElement');
+                    video.src = media.contentId;
+                }
+                return request;
+            }
+        );
+
+        context.start();
+    script
+body
+html
